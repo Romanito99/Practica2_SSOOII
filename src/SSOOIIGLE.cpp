@@ -68,6 +68,21 @@ std::string changeToLowercaseAndEraseSimbols(std::string word){
 
     return word;
 }
+std::int16_t cuenta_lineas(char* p_fichero ){
+    std::ifstream on ;
+    std::string cadena;
+    on.open(p_fichero);
+    int linea=0;
+    while (!on.eof()) {
+
+        std::string    anterior;
+        while (getline(on,cadena))
+        {
+            linea++;
+        }
+    }
+    return linea;
+}
 
 int main(int argc, char** argv)
 {   
@@ -81,16 +96,30 @@ int main(int argc, char** argv)
     in.open(p_fichero);
     std::vector<int> v_naleatorios;
     std::vector<std::thread> vhilos;
-    int size_task = LIMITE/hilos;
+    
     int valor = 0;
     int inicio = 0;
     
+    int lineastotales=cuenta_lineas(p_fichero);
+    int size_task = lineastotales/hilos;
+    for (int j = 0; j < hilos; j++)
+    {
+        inicio = j * size_task;
+        valor = (inicio + size_task) - 1;
+        if (j == hilos - 1) valor = lineastotales ;
+        std::cout <<"linea "<<inicio<< " palabra " <<valor << std::endl;}
+        //vhilos.push_back(std::thread(Suma, v_naleatorios, inicio, valor));
+    
+    //std::for_each(vhilos.begin(), vhilos.end(), std::mem_fn(&std::thread::join));
+
     while (!in.eof()) {
+        std::string    anterior;
         while (getline(in,cadena))
         {
             linea++;
             std::string     word_search = changeToLowercaseAndEraseSimbols(cadena);
             std::istringstream p(word_search);
+            
     
             while(!p.eof()){
 
@@ -99,20 +128,21 @@ int main(int argc, char** argv)
                 std::string     word= simbolos(palabra);
                 
                 if(word == p_palabra){
-                std::cout << word << std::endl;}
-
+                    std::string    posterior;
+                    p >> posterior;
+                  
+                    std::cout <<"linea "<<lineastotales<< " palabra " << word <<" , " <<anterior<<" , "<< posterior<< std::endl;}
+                   
+                    
+            
+                anterior=word;
+            }
+            
             }
         }
-    }
+    
 
-    /*for (int i = 0; i < HILOS; i++)
-    {
-        inicio = i * size_task;
-        valor = (inicio + size_task) - 1;
-        if (i == hilos - 1) valor = LIMITE - 1;
-        vhilos.push_back(std::thread(Suma, v_naleatorios, inicio, valor));
-    }
-    std::for_each(vhilos.begin(), vhilos.end(), std::mem_fn(&std::thread::join));*/
+    
 
     
 }
