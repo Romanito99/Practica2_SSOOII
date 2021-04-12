@@ -2,7 +2,7 @@ DIROBJ := obj/
 DIREXE := exec/
 DIRSRC := src/
 LDLIBS := -lpthread -lrt
-CC := gcc
+CC := g++
 FILS = Log.txt
 COPY = CopiaDeSeguridad
 
@@ -11,26 +11,14 @@ all:  dir manager PA PB PC PD DAEMON run
 dir:
 	mkdir estudiantes $(COPY) exec
 
-manager:
-	$(CC) $(LDLIBS) $(DIRSRC)Manager.c -o $(DIREXE)Manager
+SSOOIIGLE:
+	$(CC)  $(DIRSRC)SSOOIIGLE.cpp -o $(DIREXE)SSOOIIGLE.cpp -pthread -std=c++11
 
-PA:
-	$(CC) $(CFLAGS) $(DIRSRC)Pa.c -o $(DIREXE)Pa
 
-PB:
-	$(CC) $(CFLAGS) $(DIRSRC)Pb.c -o $(DIREXE)Pb
-
-PC:
-	$(CC) $(CFLAGS) $(DIRSRC)Pc.c -o $(DIREXE)Pc
-
-PD:
-	$(CC) $(CFLAGS) $(DIRSRC)Pd.c -o $(DIREXE)Pd
-DAEMON: 
-	$(CC) $(CFLAGS) $(DIRSRC)daemon.c -o $(DIREXE)daemon
 
 
 run:
-	./$(DIREXE)Manager
+	./$(DIREXE)SSOOIIGLE.cpp /home/cesar/Escritorio/CURSSOCOVID/SSOO2/Practica2_SSOOII/utils/books/17_leyes_del_trabajo_en_equipo.txt libre 4
 
 test:
 	ls -R $(FILS)
