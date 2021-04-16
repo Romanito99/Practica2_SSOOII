@@ -1,3 +1,16 @@
+/******************************************************
+* Proyecto:                Práctica 2 de Sistemas Operativos II
+* 
+* Nombre de la Clase:      SSOOIIGLE.cPP
+* 
+* Autor:                   César Braojos Corroto
+* 
+*  
+* Proposito:               Busqueda de palabras en un fichero de texto , y mostrar por pantalla con varios datos mas  
+*                          
+* 
+ ******************************************************/
+
 #include <iostream>
 #include <thread>
 #include <string>
@@ -15,16 +28,23 @@
 #include <atomic>
 #include "../include/color.h" 
 
-#define LIMITE 1000000
-#define HILOS 4
+#define LIMITE                  1000000
+#define NUM_CARACTER_ERASE      1 //Number of characters erase when find symbols
 
-#define  NUM_CARACTER_ERASE 1 //Number of characters erase when find symbols
+/******************************************************
+* CREACION DE LAS VARIABLE GLOBALES
 
+*****************************************************/
+std::mutex g_semaforo;
+std::queue<std::queue<std::string>> g_queue;
 
-std::string simbolos(std::string word){
-    
-   
+/******************************************************
+Metodo para limpiar las palabras de signos de puntuacion delanteros
 
+(¡ ¿ << "")
+
+*****************************************************/
+std::string Simbols(std::string word){
     if(!isalpha(word[0])){
         
         word.erase(0,2);
@@ -34,18 +54,17 @@ std::string simbolos(std::string word){
         word=word;
         }
     }
-    
-    
     return word;
 }
+/******************************************************
+Metodo para limpiar las palabras de signos de puntuacion traseros
+
+(. , : ; ! ? )
+
+*****************************************************/
 std::string changeToLowercaseAndEraseSimbols(std::string word){
-    std::string delimitador;
-    delimitador[1]='¿';
-    std::string aux;
     std::for_each(word.begin(), word.end(), [](char & c){
         c = ::tolower(c);
-        
-    
     });
 
     for (unsigned i = 0; i < word.size(); i++) { 
@@ -57,14 +76,17 @@ std::string changeToLowercaseAndEraseSimbols(std::string word){
 
     return word;
 }
+/******************************************************
+Metodo para contar las lineas de un fichero
 
-std::int16_t cuenta_lineas(char* p_fichero ){
-    std::ifstream on ;
-    std::string cadena;
+*****************************************************/
+std::int16_t CountLines(char* p_fichero ){
+    std::ifstream       on ;
+    std::string         cadena;
+
     on.open(p_fichero);
     int linea=0;
     while (!on.eof()) {
-
         std::string    anterior;
         while (getline(on,cadena))
         {
@@ -73,86 +95,117 @@ std::int16_t cuenta_lineas(char* p_fichero ){
     }
     return linea;
 }
-void Suma(int id ,int inicio , int valor,int hilos ,char* p_palabra ,char* p_fichero)
+
+
+/******************************************************
+Metodo para imprimir y ordenar la salida
+
+*****************************************************/
+void Print(std::string id,int size)
 {
-    std::string cadena,palabra;
-    std::ifstream in ;
-    in.open(p_fichero);
-    char* palabras;
-    int linea=0;
-    while (!in.eof()) {
-        std::string    anterior;
+int                                 i       =0;
+std::queue<std::queue<std::string>> aux     =g_queue;
+while(!aux.empty()){
+            
+            std::queue<std::string>lista2 = aux.front();
+
+            if(lista2.front()==id){
+                
+                std::chrono::milliseconds(10);
+                std::cout << BOLDBLUE << "[HILO " << RESET<< lista2.front();
+                lista2.pop();
+                std::cout << BOLDBLUE << " inicio: "<<RESET <<lista2.front();
+                lista2.pop();
+                std::cout << BOLDBLUE << " - final: "<<RESET <<lista2.front()<< "]  ::";
+                lista2.pop();
+                std::cout << BOLDBLUE << "linea "<<RESET <<lista2.front();
+                lista2.pop();
+                std::cout << BOLDBLUE << ":: ... " <<RESET<<lista2.front();
+                lista2.pop();
+                std::cout << " "  <<RED <<lista2.front();
+                lista2.pop();
+                
+                std::cout <<" " << RESET<<lista2.front()<< BOLDBLUE << " ... "<< std::endl;
+                lista2.pop();
+                   
+            }
+            aux.pop();
+            i++;
         
+        }
+}
+
+
+/******************************************************
+Metodo que ejecuta cada hilo para buscar la palabra en distintas partes del fichero
+
+*****************************************************/
+void SearchWord(int id ,int inicio , int valor,int hilos ,char* p_palabra ,char* p_fichero)
+{   
+    std::vector<std::list<std::string>*>    h_vector;
+    std::string                             cadena,palabra;
+    std::ifstream                           in ;
+    std::string                             anterior;
+    char*                                   palabras;
+    int                                     linea                               =0;
+    
+    in.open(p_fichero);
+    while (!in.eof()) {
         while (getline(in,cadena))
         {
-            
             linea++;
-            std::string     word_search = changeToLowercaseAndEraseSimbols(cadena);
-            std::istringstream p(word_search);
+            std::string         palabra_limpia     = changeToLowercaseAndEraseSimbols(cadena);
+            std::istringstream  p(palabra_limpia);
             
-            if(linea>inicio && linea<valor){
+            if(linea>=inicio && linea<=valor){
             while(!p.eof()){
-
-                std::string palabra;
+                std::string     palabra;
                 p >> palabra; 
-                std::string     word= simbolos(palabra);
-                
+                std::string     word= Simbols(palabra);
                 if(word == p_palabra){
-                    std::string    posterior;
+                    std::string                 posterior;
+                    std::string                 identificador       =std::__cxx11::to_string(id);
+                    std::string                 numero_linea         =std::__cxx11::to_string(linea);
+                    std::string                 start               =std::__cxx11::to_string(inicio);
+                    std::string                 fin                 =std::__cxx11::to_string(valor);
+                    std::queue<std::string>     cola_hilo;
                     p >> posterior;
-                    std::string identificador=std::__cxx11::to_string(id);
-                        std::string numerolinea=std::__cxx11::to_string(linea);
-                        std::list<std::string>lista;
-                        lista.push_back(identificador);
-                        lista.push_back(numerolinea);
-                        lista.push_back(anterior);
-                        lista.push_back(word);
-                        lista.push_back(posterior);
-                        std::cout << BOLDBLUE << "HILO " << RESET<< lista.front();
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",linea "<<RESET<<lista.front();
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",palabra " << RESET<<lista.front() ;
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",anterior " <<RESET<<lista.front();
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",posterior "<< RESET<<lista.front()<< std::endl;
-                        lista.pop_front();
+                    //Introducimos los datos de la palabra encontrada en una cola 
+                        cola_hilo.push(identificador);
+                        cola_hilo.push(start);
+                        cola_hilo.push(fin);
+                        cola_hilo.push(numero_linea);
+                        cola_hilo.push(anterior);
+                        cola_hilo.push(word);
+                        cola_hilo.push(posterior);
 
-                        
-                        
-                       
-                        
-                        
-                        
+                    //Seccion Critica. Introducimos a la cola general la cola con los datos de la palabra
+                        g_semaforo.lock();
+                        g_queue.push(cola_hilo);
+                        g_semaforo.unlock();
+                  
                     if (posterior==word){
                         p >> posterior;
-                        anterior=word;
-                       std::string identificador=std::__cxx11::to_string(id);
-                        std::string numerolinea=std::__cxx11::to_string(linea);
-                        std::list<std::string>lista;
-                        lista.push_back(identificador);
-                        lista.push_back(numerolinea);
-                        lista.push_back(anterior);
-                        lista.push_back(word);
-                        lista.push_back(posterior);
-                        std::cout << BOLDBLUE << "HILO " << RESET<< lista.front();
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",linea "<<RESET<<lista.front();
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",palabra " << RESET<<lista.front() ;
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",anterior " <<RESET<<lista.front();
-                        lista.pop_front();
-                        std::cout << BOLDBLUE << ",posterior "<< RESET<<lista.front()<< std::endl;
-                        lista.pop_front();
+                        anterior        =word;
+                        identificador   =std::__cxx11::to_string(id);
+                        numero_linea     =std::__cxx11::to_string(linea);
+                        std::queue<std::string>cola_hilo;
+                        //Introducimos los datos de la palabra encontrada en una cola
+                            cola_hilo.push(identificador);
+                            cola_hilo.push(start);
+                            cola_hilo.push(fin);
+                            cola_hilo.push(numero_linea);
+                            cola_hilo.push(anterior);
+                            cola_hilo.push(word);
+                            cola_hilo.push(posterior);
+                        //Seccion Critica. Introducimos a la cola general la cola con los datos de la palabra
+                            g_semaforo.lock();
+                            g_queue.push(cola_hilo);
+                            g_semaforo.unlock(); 
                     }
                 }
-                    
-            
                 anterior=word;
             }
-            
             }
         }
     }
@@ -160,69 +213,43 @@ void Suma(int id ,int inicio , int valor,int hilos ,char* p_palabra ,char* p_fic
 }
 
 
+/******************************************************
+Metodo principal
+*****************************************************/
 int main(int argc, char** argv)
 {   
-    std::string cadena,palabra;
-    std::ifstream in ;
-    char* palabras;
-    int linea=0;
-    int   hilos   = atoi(argv[3]);
-    char* p_palabra = argv[2];
-    char* p_fichero = argv[1];
-    in.open(p_fichero);
-   
-    int lineastotales=cuenta_lineas(p_fichero);
-    int size_task = lineastotales/hilos;
+    std::vector<std::thread>        v_hilos;
+    std::ifstream                   in ;
+    
+    if (argc != 4)
+    {
+        fprintf(stderr, "ERROR! El numero de argumentos introducidos es incorrecto Prueba: ./exec/SSOOIIGLE <nombre_fichero> <palabra> <numero_hilos> ");
+        return EXIT_FAILURE;
+    }
 
-    std::vector<std::thread> vhilos;
-    int valor = 0;
-    int inicio = 0;
+    int     hilos           = atoi(argv[3]);
+    char*   p_palabra       = argv[2];
+    char*   p_fichero       = argv[1];
+    int     lineastotales   =CountLines(p_fichero);
+    int     size_task       = lineastotales/hilos;
+    int     valor           = 0;
+    int     inicio          = 0;
+
+    in.open(p_fichero);
+
+    //Creacion de hilos , y llamada diviendo el fichero dependiendo de los hilos 
     for (int i = 0; i < hilos; i++)
     {
         inicio = i * size_task;
         valor = (inicio + size_task) - 1;
-        if (i == HILOS - 1) valor = LIMITE - 1;
-        vhilos.push_back(std::thread(Suma,i , inicio,valor,hilos,p_palabra,p_fichero));
+        if (i == hilos - 1) valor = LIMITE - 1;
+        v_hilos.push_back(std::thread(SearchWord,i , inicio,valor,hilos,p_palabra,p_fichero));
     }
+    std::for_each(v_hilos.begin(), v_hilos.end(), std::mem_fn(&std::thread::join));
 
-    std::for_each(vhilos.begin(), vhilos.end(), std::mem_fn(&std::thread::join));
-
-    /*while (!in.eof()) {
-        std::string    anterior;
-        while (getline(in,cadena,8))
-        {
-            
-            linea++;
-            std::string     word_search = changeToLowercaseAndEraseSimbols(cadena);
-            std::istringstream p(word_search);
-            
-    
-            while(!p.eof()){
-
-                std::string palabra;
-                p >> palabra; 
-                std::string     word= simbolos(palabra);
-                
-                if(word == p_palabra){
-                    std::string    posterior;
-                    p >> posterior;
-                    std::cout <<"linea "<<linea<< " palabra " << word <<" , " <<anterior<<" , "<< posterior<< std::endl;
-                    if (posterior==word){
-                        p >> posterior;
-                        anterior=word;
-                        std::cout <<"linea "<<linea<< " palabra " << anterior <<" , " <<word<<" , "<< posterior<< std::endl;
-                    }
-                }
-                    
-            
-                anterior=word;
-            }
-            
-            }
-        }*/
-    
-
-    
-
-    
+    //Realizamos la impresion por hilos 
+    for(int i=0;i<hilos;i++){
+        std::string j =std::__cxx11::to_string(i);
+        Print(j,g_queue.size());
+    }
 }
