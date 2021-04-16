@@ -116,11 +116,11 @@ while(!aux.empty()){
                 lista2.pop();
                 std::cout << BOLDBLUE << " inicio: "<<RESET <<lista2.front();
                 lista2.pop();
-                std::cout << BOLDBLUE << " - final: "<<RESET <<lista2.front()<< "]  ::";
+                std::cout << BOLDBLUE << " - final: "<<RESET <<lista2.front()<< BOLDBLUE<<"]::";
                 lista2.pop();
                 std::cout << BOLDBLUE << "linea "<<RESET <<lista2.front();
                 lista2.pop();
-                std::cout << BOLDBLUE << ":: ... " <<RESET<<lista2.front();
+                std::cout << BOLDBLUE << ":: ..." <<RESET<<lista2.front();
                 lista2.pop();
                 std::cout << " "  <<RED <<lista2.front();
                 lista2.pop();
@@ -147,10 +147,10 @@ void SearchWord(int id ,int inicio , int valor,int hilos ,char* p_palabra ,char*
     std::ifstream                           in ;
     std::string                             anterior;
     char*                                   palabras;
-    int                                     linea                               =0;
-    
+    int                                     linea               =0;
     in.open(p_fichero);
     while (!in.eof()) {
+        
         while (getline(in,cadena))
         {
             linea++;
@@ -204,12 +204,25 @@ void SearchWord(int id ,int inicio , int valor,int hilos ,char* p_palabra ,char*
                             g_semaforo.unlock(); 
                     }
                 }
-                anterior=word;
+                anterior=palabra;
             }
             }
         }
     }
     
+    
+}
+void messageWelcome(){
+    std::cout <<BOLDBLUE << "SS" << BOLDRED << "O" << BOLDYELLOW << "O"<< BOLDBLUE << "II" << BOLDGREEN << "GL" << BOLDRED << "E" << RESET;
+    std::cout <<RESET<< "::BIENVENIDO A TU BUSCADOR::" << BOLDBLUE << "SS" << BOLDRED << "O" << BOLDYELLOW << "O";
+    std::cout << BOLDBLUE << "II" << BOLDGREEN << "GL" << BOLDRED << "E\n" << RESET << std::endl;
+    std::cout << BOLDBLUE << " "  << std::endl; 
+}
+void messageEnd(){
+    std::cout << BOLDBLUE << " "  << std::endl;
+    std::cout <<BOLDBLUE << "SS" << BOLDRED << "O" << BOLDYELLOW << "O"<< BOLDBLUE << "II" << BOLDGREEN << "GL" << BOLDRED << "E" << RESET;
+    std::cout << RESET <<"::GRACIAS POR SU CONFIANZA::" << BOLDBLUE << "SS" << BOLDRED << "O" << BOLDYELLOW << "O" ;
+    std::cout << BOLDBLUE << "II" << BOLDGREEN << "GL" << BOLDRED << "E" << RESET << std::endl; 
 }
 
 
@@ -217,7 +230,9 @@ void SearchWord(int id ,int inicio , int valor,int hilos ,char* p_palabra ,char*
 Metodo principal
 *****************************************************/
 int main(int argc, char** argv)
-{   
+{  
+    messageWelcome();
+    
     std::vector<std::thread>        v_hilos;
     std::ifstream                   in ;
     
@@ -242,7 +257,7 @@ int main(int argc, char** argv)
     {
         inicio = i * size_task;
         valor = (inicio + size_task) - 1;
-        if (i == hilos - 1) valor = LIMITE - 1;
+        if (i == hilos - 1) valor = lineastotales;
         v_hilos.push_back(std::thread(SearchWord,i , inicio,valor,hilos,p_palabra,p_fichero));
     }
     std::for_each(v_hilos.begin(), v_hilos.end(), std::mem_fn(&std::thread::join));
@@ -252,4 +267,6 @@ int main(int argc, char** argv)
         std::string j =std::__cxx11::to_string(i);
         Print(j,g_queue.size());
     }
+    messageEnd();
+    return EXIT_SUCCESS; 
 }

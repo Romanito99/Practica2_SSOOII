@@ -10,7 +10,7 @@ Fecha: 15-Marzo-2021
 
     $~make
 
-Este comando se encargar de ejcutar los comandos para preparar la ejecucion y lo ejecutara.
+Este comando se encargar de ejcutar los comandos para preparar la ejecucion y lo ejecutara.Concretamente se encarga de limpiar el fichero de carpetas que sobren y crear los ejecutables necesario para los test 
     
 **LIMPIEZA CARPETA:**
 
@@ -18,18 +18,17 @@ Este comando se encargar de ejcutar los comandos para preparar la ejecucion y lo
     
 Este comando se encargar de eliminar las carpetas y archivos creados en la ejecución.
 
-
-Finalmente por las caracteristicas del programa he añadido una opcion para ver los deamon que se estan ejecutando en tu ordenador , y asi poder parar el daemon de mi practica 
-
 **RUN:**
 
-    $~make RUN
+    $~make test
+    $~make test1
+    $~make test2
   
- Este comando se  encarga de la ejecucion del programa. Dentro del archivo makefile puedes cambiar los ficheros la palabra que buscas o el numero de hilos que quierees ejecutar
+ Estos comandos se  encargan de la ejecucion del programa. Dentro del archivo makefile puedes cambiar los ficheros la palabra que buscas o el numero de hilos que quierees ejecutar. He puesto tres opciones de ejecución para comprobar en distintos hilos o distntos archivos
  
     $~./$(DIREXE)SSOOIIGLE.cpp <nombre fichero> <palabra> <numero de hilos>
 
  Por ejemplo: 
   
-    $~./$(DIREXE)SSOOIIGLE.cpp Practica2_SSOOII/utils/books/21_leyes_del_liderazgo.txt navegación 4
+    $~./$(DIREXE)SSOOIIGLE.cpp utils/books/21_leyes_del_liderazgo.txt navegación 4
 

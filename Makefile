@@ -14,9 +14,13 @@ dir:
 SSOOIIGLE:
 	$(CC)  $(DIRSRC)SSOOIIGLE.cpp -o $(DIREXE)SSOOIIGLE.cpp -pthread -std=c++11
 
-run:
-	./$(DIREXE)SSOOIIGLE.cpp Practica2_SSOOII/utils/books/21_leyes_del_liderazgo.txt navegación 4
+test:
+	./$(DIREXE)SSOOIIGLE.cpp utils/books/21_leyes_del_liderazgo.txt aprender 4
 
+test1:
+	./$(DIREXE)SSOOIIGLE.cpp utils/books/Vive_tu_sueño.txt millón 6
+test2:
+	./$(DIREXE)SSOOIIGLE.cpp utils/books/Abe_Shana_La_ultima_sirena.txt supuesto 8
 
 clean:
 
