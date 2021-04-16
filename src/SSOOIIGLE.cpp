@@ -212,12 +212,20 @@ void SearchWord(int id ,int inicio , int valor,int hilos ,char* p_palabra ,char*
     
     
 }
+/******************************************************
+Metodo para mostrar un mensaje de bienvenida
+
+*****************************************************/
 void messageWelcome(){
     std::cout <<BOLDBLUE << "SS" << BOLDRED << "O" << BOLDYELLOW << "O"<< BOLDBLUE << "II" << BOLDGREEN << "GL" << BOLDRED << "E" << RESET;
     std::cout <<RESET<< "::BIENVENIDO A TU BUSCADOR::" << BOLDBLUE << "SS" << BOLDRED << "O" << BOLDYELLOW << "O";
     std::cout << BOLDBLUE << "II" << BOLDGREEN << "GL" << BOLDRED << "E\n" << RESET << std::endl;
     std::cout << BOLDBLUE << " "  << std::endl; 
 }
+/******************************************************
+Metodo para mostrar un mensaje de despedida
+
+*****************************************************/
 void messageEnd(){
     std::cout << BOLDBLUE << " "  << std::endl;
     std::cout <<BOLDBLUE << "SS" << BOLDRED << "O" << BOLDYELLOW << "O"<< BOLDBLUE << "II" << BOLDGREEN << "GL" << BOLDRED << "E" << RESET;
